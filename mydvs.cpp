@@ -65,13 +65,27 @@ void MyDVS::run()
                         event.y = caerPolarityEventGetY(caerPolarityIteratorElement);
                         event.polarity = caerPolarityEventGetPolarity(caerPolarityIteratorElement)?1:0;
                         //if(undistortPoint(event,params.K_cam,params.radial))
-                        cout<<"event - t: "<<event.t<<"x: "<<event.x<<"y: "<<event.y<<"polarity: "<<event.polarity<<endl;
+                        //cout<<"event - t: "<<event.t<<"x: "<<event.x<<"y: "<<event.y<<"polarity: "<<event.polarity<<endl;
                         events_buffer.push_back(event);
+                        //events_show.push_back(event);
                     }
                 }
             }//for
             caerEventPacketContainerFree(packetContainer);
-            //DVS_Handle->addEvents(events_buffer);
+            //mutex_data.lock();
+            for(int ii=0; ii < (int)(events_buffer.size()); ii++)
+            {
+                events_show.push_back(events_buffer[ii]);
+            }
+            cout<<"length"<<events_show.size()<<endl;
+            emit DVSimagechanged();
+            //mutex_data.unlock();
+            //cout<<"length"<<events_buffer.size()<<endl;
+//            cout<<"length"<<events_show.size()<<endl;
+//            if((int)(events_show.size()) > events_length)
+//            {
+//                emit DVSimagechanged();
+//            }
         }
         dvs128_deinit();
     }
@@ -150,18 +164,18 @@ bool MyDVS::dvs128_init()
      caerDeviceConfigSet(dvs128_handle, DVS128_CONFIG_BIAS, DVS128_CONFIG_BIAS_REQ, 309590);
      caerDeviceConfigSet(dvs128_handle, DVS128_CONFIG_BIAS, DVS128_CONFIG_BIAS_REQPD, 16777215);
     // Values taken from DVS_SLOW
- //   caerDeviceConfigSet(dvs128_handle, DVS128_CONFIG_BIAS, DVS128_CONFIG_BIAS_CAS, 54);
- //   caerDeviceConfigSet(dvs128_handle, DVS128_CONFIG_BIAS, DVS128_CONFIG_BIAS_DIFF, 30153);
- //   caerDeviceConfigSet(dvs128_handle, DVS128_CONFIG_BIAS, DVS128_CONFIG_BIAS_DIFFON, 482443);
- //   caerDeviceConfigSet(dvs128_handle, DVS128_CONFIG_BIAS, DVS128_CONFIG_BIAS_DIFFOFF, 132);
- //   caerDeviceConfigSet(dvs128_handle, DVS128_CONFIG_BIAS, DVS128_CONFIG_BIAS_FOLL, 51);
- //   caerDeviceConfigSet(dvs128_handle, DVS128_CONFIG_BIAS, DVS128_CONFIG_BIAS_INJGND, 1108364);
- //   caerDeviceConfigSet(dvs128_handle, DVS128_CONFIG_BIAS, DVS128_CONFIG_BIAS_PR, 3);
- //   caerDeviceConfigSet(dvs128_handle, DVS128_CONFIG_BIAS, DVS128_CONFIG_BIAS_PUX, 8159221);
- //   caerDeviceConfigSet(dvs128_handle, DVS128_CONFIG_BIAS, DVS128_CONFIG_BIAS_PUY, 16777215);
- //   caerDeviceConfigSet(dvs128_handle, DVS128_CONFIG_BIAS, DVS128_CONFIG_BIAS_REFR, 6);
- //   caerDeviceConfigSet(dvs128_handle, DVS128_CONFIG_BIAS, DVS128_CONFIG_BIAS_REQ, 159147);
- //   caerDeviceConfigSet(dvs128_handle, DVS128_CONFIG_BIAS, DVS128_CONFIG_BIAS_REQPD, 16777215);
+//    caerDeviceConfigSet(dvs128_handle, DVS128_CONFIG_BIAS, DVS128_CONFIG_BIAS_CAS, 54);
+//    caerDeviceConfigSet(dvs128_handle, DVS128_CONFIG_BIAS, DVS128_CONFIG_BIAS_DIFF, 30153);
+//    caerDeviceConfigSet(dvs128_handle, DVS128_CONFIG_BIAS, DVS128_CONFIG_BIAS_DIFFON, 482443);
+//    caerDeviceConfigSet(dvs128_handle, DVS128_CONFIG_BIAS, DVS128_CONFIG_BIAS_DIFFOFF, 132);
+//    caerDeviceConfigSet(dvs128_handle, DVS128_CONFIG_BIAS, DVS128_CONFIG_BIAS_FOLL, 51);
+//    caerDeviceConfigSet(dvs128_handle, DVS128_CONFIG_BIAS, DVS128_CONFIG_BIAS_INJGND, 1108364);
+//    caerDeviceConfigSet(dvs128_handle, DVS128_CONFIG_BIAS, DVS128_CONFIG_BIAS_PR, 3);
+//    caerDeviceConfigSet(dvs128_handle, DVS128_CONFIG_BIAS, DVS128_CONFIG_BIAS_PUX, 8159221);
+//    caerDeviceConfigSet(dvs128_handle, DVS128_CONFIG_BIAS, DVS128_CONFIG_BIAS_PUY, 16777215);
+//    caerDeviceConfigSet(dvs128_handle, DVS128_CONFIG_BIAS, DVS128_CONFIG_BIAS_REFR, 6);
+//    caerDeviceConfigSet(dvs128_handle, DVS128_CONFIG_BIAS, DVS128_CONFIG_BIAS_REQ, 159147);
+//    caerDeviceConfigSet(dvs128_handle, DVS128_CONFIG_BIAS, DVS128_CONFIG_BIAS_REQPD, 16777215);
 
     caerDeviceDataStart(dvs128_handle, NULL, NULL, NULL, NULL, NULL);
     caerDeviceConfigSet(dvs128_handle, CAER_HOST_CONFIG_DATAEXCHANGE, CAER_HOST_CONFIG_DATAEXCHANGE_BLOCKING, true);

@@ -44,6 +44,8 @@ class Dialog : public QDialog
 public:
     explicit Dialog(QWidget *parent = 0);
     ~Dialog();
+public slots:
+    void onDVSimagechanged(void);
 
 private slots:
     void on_pushButton_clicked();

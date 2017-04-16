@@ -29,6 +29,8 @@ History:      inilabs->libcaer VLOGroup->dvs-reconstruction libusb-1.0
 
 using namespace std;
 
+#define events_length 100
+
 /*************************************************
 Class:        MyDVS
 Description:  the class for dvs128
@@ -47,6 +49,10 @@ public:
     void run() Q_DECL_OVERRIDE;
     void dvs128_stop(void);
     void dvs128_start(void);
+    std::vector<Event> events_show;
+
+signals:
+    void DVSimagechanged(void);
 
 protected:
     std::vector<Event> events_buffer;
