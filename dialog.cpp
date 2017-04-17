@@ -11,6 +11,8 @@ History:      inilabs->libcaer VLOGroup->dvs-reconstruction libusb-1.0
 #include "dialog.h"
 #include "ui_dialog.h"
 
+#define events_length 2000
+
 /*************************************************
 Function:     Dialog()
 Description:  Dialog Class's construction function
@@ -48,6 +50,7 @@ Dialog::~Dialog()
 {
     delete ui;
 }
+
 /*************************************************
 Function:     Dialog::onDVSimagechanged()
 Description:  slot get the DVS image changed
@@ -60,40 +63,70 @@ Others:       none
 *************************************************/
 void Dialog::onDVSimagechanged(void)
 {
-    //QMutex mutex_events;
+    int show_size = (int)(myDVS128->events_show.size()),
+        show_part = show_size / events_length,
+        show_phase = show_size % events_length;
     QRgb value_red = qRgb(255, 0, 0),
          value_green = qRgb(0, 255, 0);
-         //value_black = qRgb(0, 0, 0);
     QImage events_Grap=QImage(128,128,QImage::Format_RGB32);
-           //scene_black=QImage(128,128,QImage::Format_RGB32);
 
-//    for(int x_counter; x_counter<128; x_counter++)
-//    {
-//        for(int y_counter; y_counter<128; y_counter++)
-//        {
-//            events_Grap.setPixel(x_counter,y_counter, value_black);
-//        }
-//    }
-//    scene_black = scene_black.scaled(640, 640,Qt::KeepAspectRatioByExpanding);
-//    scene->addPixmap(QPixmap::fromImage(scene_black));
+    events_Grap.fill(Qt::black);
 
-    scene->clear();
-    //mutex_events.lock();
-    for(int counter = 0 ; counter< (int)(myDVS128->events_show.size()) ; counter++)
+    if(show_part == 0)
     {
-        if(myDVS128->events_show[counter].polarity == 1)
+        for(int counter_phase = 0; counter_phase < show_phase; counter_phase++)
         {
-           events_Grap.setPixel((myDVS128->events_show[counter].x),(myDVS128->events_show[counter].y), value_red);
+            if(myDVS128->events_show[counter_phase].polarity == 1)
+            {
+               events_Grap.setPixel((myDVS128->events_show[counter_phase].x),(myDVS128->events_show[counter_phase].y), value_red);
+            }
+            else if(myDVS128->events_show[counter_phase].polarity == 0)
+            {
+                events_Grap.setPixel((myDVS128->events_show[counter_phase].x),(myDVS128->events_show[counter_phase].y), value_green);
+            }
         }
-        else if(myDVS128->events_show[counter].polarity == 0)
-        {
-            events_Grap.setPixel((myDVS128->events_show[counter].x),(myDVS128->events_show[counter].y), value_green);
-        }
+        scene->clear();
+        myDVS128->events_show.clear();
+        events_Grap = events_Grap.scaled(640, 640, Qt::KeepAspectRatioByExpanding);
+        scene->addPixmap(QPixmap::fromImage(events_Grap));
     }
-    myDVS128->events_show.clear();
-    //mutex_events.unlock();
-    events_Grap = events_Grap.scaled(640, 640,Qt::KeepAspectRatioByExpanding);
-    scene->addPixmap(QPixmap::fromImage(events_Grap));
+    else
+    {
+        for(int counter_part = 0; counter_part < show_part; counter_part++)
+        {
+            for(int counter_length = 0; counter_length < events_length; counter_length++)
+            {
+                if(myDVS128->events_show[counter_part*events_length + counter_length].polarity == 1)
+                {
+                   events_Grap.setPixel((myDVS128->events_show[counter_part*events_length + counter_length].x),(myDVS128->events_show[counter_part*events_length + counter_length].y), value_red);
+                }
+                else if(myDVS128->events_show[counter_part*events_length + counter_length].polarity == 0)
+                {
+                    events_Grap.setPixel((myDVS128->events_show[counter_part*events_length + counter_length].x),(myDVS128->events_show[counter_part*events_length + counter_length].y), value_green);
+                }
+            }
+            scene->clear();
+            events_Grap = events_Grap.scaled(640, 640, Qt::KeepAspectRatioByExpanding);
+            scene->addPixmap(QPixmap::fromImage(events_Grap));
+            events_Grap.fill(Qt::black);
+            events_Grap = events_Grap.scaled(128, 128, Qt::KeepAspectRatioByExpanding);
+        }
+        for(int counter_phase = 0; counter_phase < show_phase; counter_phase++)
+        {
+            if(myDVS128->events_show[show_part*events_length + counter_phase].polarity == 1)
+            {
+               events_Grap.setPixel((myDVS128->events_show[show_part*events_length + counter_phase].x),(myDVS128->events_show[show_part*events_length + counter_phase].y), value_red);
+            }
+            else if(myDVS128->events_show[show_part*events_length + counter_phase].polarity == 0)
+            {
+                events_Grap.setPixel((myDVS128->events_show[show_part*events_length + counter_phase].x),(myDVS128->events_show[show_part*events_length + counter_phase].y), value_green);
+            }
+        }
+        scene->clear();
+        myDVS128->events_show.clear();
+        events_Grap = events_Grap.scaled(640, 640, Qt::KeepAspectRatioByExpanding);
+        scene->addPixmap(QPixmap::fromImage(events_Grap));
+    }
 }
 
 /*************************************************

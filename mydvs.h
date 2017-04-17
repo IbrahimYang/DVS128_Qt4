@@ -29,8 +29,6 @@ History:      inilabs->libcaer VLOGroup->dvs-reconstruction libusb-1.0
 
 using namespace std;
 
-#define events_length 100
-
 /*************************************************
 Class:        MyDVS
 Description:  the class for dvs128
