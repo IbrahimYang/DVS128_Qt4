@@ -17,6 +17,7 @@ History:      inilabs->libcaer VLOGroup->dvs-reconstruction libusb-1.0
 #include <QtGui>
 #include <QGraphicsScene>
 #include <QImage>
+#include <vector>
 
 /*include local My library*/
 #include "mydvs.h"
@@ -45,17 +46,20 @@ public:
     explicit Dialog(QWidget *parent = 0);
     ~Dialog();
 public slots:
-    void onDVSimagechanged(void);
+    void onDVSimagechanged();
+    void onPacketnumberchanged(int packet_size);
 
 private slots:
-    void on_pushButton_clicked();
 
-    void on_pushButton_2_clicked();
+    void on_start_Button_clicked();
+
+    void on_stop_Button_clicked();
 
 private:
     Ui::Dialog *ui;
     QGraphicsScene *scene;
     MyDVS *myDVS128;
+    std::vector<int> packet_size_buffer;
 };
 
 #endif // DIALOG_H

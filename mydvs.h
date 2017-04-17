@@ -21,11 +21,11 @@ History:      inilabs->libcaer VLOGroup->dvs-reconstruction libusb-1.0
 
 /*include local My library*/
 #include "event.h"
-//#include "data_handle.h"
 
 /*include local Qt library*/
 #include <QtCore>
 #include <QtGui>
+#include <QThread>
 
 using namespace std;
 
@@ -51,6 +51,7 @@ public:
 
 signals:
     void DVSimagechanged(void);
+    void Packetnumberchanged(int);
 
 protected:
     std::vector<Event> events_buffer;

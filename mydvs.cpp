@@ -12,8 +12,8 @@ History:      inilabs->libcaer VLOGroup->dvs-reconstruction libusb-1.0
 
 /*************************************************
 Function:     MyDVS::MyDVS(Data_Handle *DVS_work)
-Description:  the is the run function to get dvs image
-Calls:        MyDVS Clas's function
+Description:  the consturction function of MyDVS
+Calls:        MyDVS Class's function
 Called By:    none
 Input:        none
 Output:       none
@@ -67,25 +67,16 @@ void MyDVS::run()
                         //if(undistortPoint(event,params.K_cam,params.radial))
                         //cout<<"event - t: "<<event.t<<"x: "<<event.x<<"y: "<<event.y<<"polarity: "<<event.polarity<<endl;
                         events_buffer.push_back(event);
-                        //events_show.push_back(event);
                     }
                 }
             }//for
             caerEventPacketContainerFree(packetContainer);
-            //mutex_data.lock();
             for(int ii=0; ii < (int)(events_buffer.size()); ii++)
             {
                 events_show.push_back(events_buffer[ii]);
             }
-            cout<<"length"<<events_show.size()<<endl;
             emit DVSimagechanged();
-            //mutex_data.unlock();
-            //cout<<"length"<<events_buffer.size()<<endl;
-//            cout<<"length"<<events_show.size()<<endl;
-//            if((int)(events_show.size()) > events_length)
-//            {
-//                emit DVSimagechanged();
-//            }
+            emit Packetnumberchanged((int)events_buffer.size());
         }
         dvs128_deinit();
     }

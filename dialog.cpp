@@ -12,6 +12,7 @@ History:      inilabs->libcaer VLOGroup->dvs-reconstruction libusb-1.0
 #include "ui_dialog.h"
 
 #define events_length 2000
+#define avarge_length 10
 
 /*************************************************
 Function:     Dialog()
@@ -34,6 +35,7 @@ Dialog::Dialog(QWidget *parent) :
     myDVS128 = new MyDVS();
 
     connect(myDVS128, SIGNAL(DVSimagechanged()),this,SLOT(onDVSimagechanged()));
+    connect(myDVS128, SIGNAL(Packetnumberchanged(int)),this,SLOT(onPacketnumberchanged(int)));
 }
 
 /*************************************************
@@ -61,7 +63,7 @@ Output:       none
 Return:       none
 Others:       none
 *************************************************/
-void Dialog::onDVSimagechanged(void)
+void Dialog::onDVSimagechanged()
 {
     int show_size = (int)(myDVS128->events_show.size()),
         show_part = show_size / events_length,
@@ -69,7 +71,6 @@ void Dialog::onDVSimagechanged(void)
     QRgb value_red = qRgb(255, 0, 0),
          value_green = qRgb(0, 255, 0);
     QImage events_Grap=QImage(128,128,QImage::Format_RGB32);
-
     events_Grap.fill(Qt::black);
 
     if(show_part == 0)
@@ -108,8 +109,8 @@ void Dialog::onDVSimagechanged(void)
             scene->clear();
             events_Grap = events_Grap.scaled(640, 640, Qt::KeepAspectRatioByExpanding);
             scene->addPixmap(QPixmap::fromImage(events_Grap));
-            events_Grap.fill(Qt::black);
             events_Grap = events_Grap.scaled(128, 128, Qt::KeepAspectRatioByExpanding);
+            events_Grap.fill(Qt::black);
         }
         for(int counter_phase = 0; counter_phase < show_phase; counter_phase++)
         {
@@ -130,7 +131,7 @@ void Dialog::onDVSimagechanged(void)
 }
 
 /*************************************************
-Function:     Dialog::on_pushButton_clicked()
+Function:     Dialog::onPacketnumberchanged(int packet_size)
 Description:  start function
 Calls:        none
 Called By:    none
@@ -139,14 +140,44 @@ Output:       none
 Return:       none
 Others:       none
 *************************************************/
-void Dialog::on_pushButton_clicked()
+void Dialog::onPacketnumberchanged(int packet_size)
+{
+    int avarge = 0;
+
+    if(packet_size_buffer.size() > avarge_length)
+    {
+        for(int ii=0; ii<(int)packet_size_buffer.size(); ii++)
+        {
+            avarge += packet_size_buffer[ii];
+        }
+        avarge /= avarge_length;
+        ui->label->setText(QString::number(avarge));
+        packet_size_buffer.clear();
+    }
+    else
+    {
+        packet_size_buffer.push_back(packet_size);
+    }
+}
+
+/*************************************************
+Function:     Dialog::on_start_Button_clicked()
+Description:  start function
+Calls:        none
+Called By:    none
+Input:        none
+Output:       none
+Return:       none
+Others:       none
+*************************************************/
+void Dialog::on_start_Button_clicked()
 {
     myDVS128->start();
     myDVS128->dvs128_start();
 }
 
 /*************************************************
-Function:     Dialog::on_pushButton_2_clicked()
+Function:     Dialog::on_stop_Button_clicked()
 Description:  stop function
 Calls:        none
 Called By:    none
@@ -155,7 +186,7 @@ Output:       none
 Return:       none
 Others:       none
 *************************************************/
-void Dialog::on_pushButton_2_clicked()
+void Dialog::on_stop_Button_clicked()
 {
     myDVS128->dvs128_stop();
     scene->clear();
